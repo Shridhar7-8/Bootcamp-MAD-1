@@ -7,7 +7,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///thivya.db"
 app.config['SECRET_KEY'] = "thivya"
 
 
-db.init_app(app)
+db.init_app(app) # Initialize the database with the app
 
 
 with app.app_context():
