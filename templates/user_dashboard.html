@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Welcome to Your Dashboard</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Button to Create a New Post -->
+        <a href="{{ url_for('controllers.create_post') }}" class="btn btn-success mb-3">Create New Post</a>
+
+        <!-- Display User's Posts -->
+        {% if posts %}
+            {% for post in posts %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.content }}</p>
+                        <small>Posted on {{ post.created_at }}</small>
+
+                        <!-- Actions for the Post -->
+                        <div class="mt-3">
+                            <a href="{{ url_for('controllers.edit_post', post_id=post.id) }}" class="btn btn-primary">Edit</a>
+                            <form action="{{ url_for('controllers.delete_post', post_id=post.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                            {% if post.flagged %}
+                                <form action="{{ url_for('controllers.unflag_post', post_id=post.id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-warning">Unflag</button>
+                                </form>
+                            {% else %}
+                                <form action="{{ url_for('controllers.flag_post', post_id=post.id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-secondary">Flag</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No posts found. Create your first post!</p>
+        {% endif %}
+
+        <!-- Logout Button -->
+        <div class="mt-4">
+            <a href="{{ url_for('controllers.logout') }}" class="btn btn-secondary">Logout</a>
+        </div>
+    </div>
+</body>
+</html>
