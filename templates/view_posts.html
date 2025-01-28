@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Posts</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>All Posts</h2>
+
+        <!-- Display flashed messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Search Bar -->
+        <form action="{{ url_for('controllers.search_posts') }}" method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-5">
+                    <input type="text" name="title" class="form-control" placeholder="Search by title" value="{{ request.args.get('title', '') }}">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" name="user_id" class="form-control" placeholder="Search by User ID" value="{{ request.args.get('user_id', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Buttons Row -->
+        <div class="d-flex justify-content-between mb-3">
+            <!-- Button to Create a New Post -->
+            <a href="{{ url_for('controllers.create_post') }}" class="btn btn-success">Create New Post</a>
+            
+            <!-- Button to View Summary -->
+            <a href="{{ url_for('controllers.summary') }}" class="btn btn-info">View Summary</a>
+
+            <!-- Link to User Dashboard (only for logged-in users) -->
+            {% if 'user_id' in session %}
+                <a href="{{ url_for('controllers.user_dashboard') }}" class="btn btn-secondary">Go to Dashboard</a>
+            {% endif %}
+        </div>
+        
+        <!-- Display Posts -->
+        {% if posts %}
+            {% for post in posts %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.content }}</p>
+                    <small>Posted by User ID {{ post.user_id }}</small>
+
+                    <!-- Show actions if the user is the author or an admin -->
+                    {% if post.user_id == session.get('user_id') or session.get('role') == 'admin' %}
+                        {% if post.flagged %}
+                            <form action="{{ url_for('controllers.unflag_post', post_id=post.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-warning">Unflag</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('controllers.flag_post', post_id=post.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-primary">Flag</button>
+                            </form>
+                        {% endif %}
+                        <a href="{{ url_for('controllers.edit_post', post_id=post.id) }}" class="btn btn-primary">Edit</a>
+                        <!-- <form action="{{ url_for('controllers.delete_post', post_id=post.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form> -->
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No posts found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
