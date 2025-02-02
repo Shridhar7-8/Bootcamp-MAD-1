@@ -184,7 +184,7 @@ def flag_post(post_id):
     return redirect(url_for('controllers.view_posts'))
 
 # Route for unflagging a post
-@controllers.route('/post/unflag/<int:post_id>', methods=['POST'])
+@controllers.route('/post/unflag/<int:post_id>', methods=['POST','GET'])
 def unflag_post(post_id):
     if 'user_id' not in session:
         flash('Please log in to unflag a post.')
@@ -193,7 +193,7 @@ def unflag_post(post_id):
     post = Post.query.get_or_404(post_id)
     if session.get('role') != 'admin':
         flash('You are not authorized to unflag this post.')
-        return redirect(url_for('controllers.view_posts'))
+        return redirect(url_for('controllers.admin_dashboard'))
 
     post.flagged = False
     db.session.commit()
