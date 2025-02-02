@@ -71,9 +71,9 @@
                             </form>
                         {% endif %}
                         <a href="{{ url_for('controllers.edit_post', post_id=post.id) }}" class="btn btn-primary">Edit</a>
-                        <!-- <form action="{{ url_for('controllers.delete_post', post_id=post.id) }}" method="post" style="display:inline;">
+                        <form action="{{ url_for('controllers.delete_post', post_id=post.id) }}" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Delete</button>
-                        </form> -->
+                        </form>
                     {% endif %}
                 </div>
             </div>

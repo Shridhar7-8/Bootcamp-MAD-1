@@ -1,14 +1,10 @@
 from models.models import *
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, request, render_template, redirect, url_for, flash, session,Blueprint
-import matplotlib.pyplot as plt
 import os
-
+import matplotlib.pyplot as plt
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
 controllers = Blueprint('controllers', __name__)
-
-
-
 
 # Home route
 @controllers.route('/')
@@ -40,7 +36,7 @@ def login():
         password = request.form['password']
         
         user = User.query.filter_by(email=email).first()
-        if user and user.password == password:
+        if user and check_password_hash(user.password, password):
             session['user_id'] = user.id  # Store user ID in session
             session['role'] = user.roles  # Store user role in session
             flash('Login successful!')
@@ -61,7 +57,7 @@ def admin_login():
         password = request.form['password']
         
         user = User.query.filter_by(email=email, roles='admin').first()
-        if user and user.password == password:
+        if user and check_password_hash(user.password, password):
             session['user_id'] = user.id  # Store user ID in session
             session['role'] = user.roles  # Store user role in session
             flash('Admin login successful!')
@@ -244,5 +240,3 @@ def summary():
     plt.close()
 
     return render_template('summary.html', graph_url=url_for('static', filename='user_posts_graph.png'))
-
-
