@@ -166,6 +166,26 @@ def delete_post(post_id):
     flash('Post deleted successfully!')
     return redirect(url_for('controllers.view_posts'))
 
+# Route for deleting the post by admin
+@controllers.route('/admin/post/delete/<int:post_id>', methods=['POST'])
+def admin_delete_post(post_id):
+    if 'user_id' not in session:
+        flash('Please log in as an admin to delete a post.')
+        return redirect(url_for('controllers.login'))
+
+    # Ensure only admins can access this route
+    if session.get('role') != 'admin':
+        abort(403)  # Unauthorized access
+
+    # Fetch and delete the post
+    post = Post.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    
+    flash('Post deleted successfully by admin!')
+    return redirect(url_for('controllers.admin_dashboard'))
+
+
 # Route for flagging a post
 @controllers.route('/post/flag/<int:post_id>', methods=['POST'])
 def flag_post(post_id):
