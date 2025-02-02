@@ -2,7 +2,7 @@ from models.models import *
 import os
 import matplotlib.pyplot as plt
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session,abort
 
 controllers = Blueprint('controllers', __name__)
 
@@ -193,12 +193,12 @@ def unflag_post(post_id):
     post = Post.query.get_or_404(post_id)
     if session.get('role') != 'admin':
         flash('You are not authorized to unflag this post.')
-        return redirect(url_for('controllers.admin_dashboard'))
+        return redirect(url_for('controllers.view_posts'))
 
     post.flagged = False
     db.session.commit()
     flash('Post unflagged successfully!')
-    return redirect(url_for('controllers.view_posts'))
+    return redirect(url_for('controllers.admin_dashboard'))
 
 # Route for searching posts
 @controllers.route('/search_posts', methods=['GET'])
@@ -218,6 +218,25 @@ def search_posts():
 
     posts = query.all()
     return render_template('view_posts.html', posts=posts)
+
+
+# Route for deleting the user
+@controllers.route('/user/delete/<int:user_id>', methods=['POST','GET'])
+def delete_user(user_id):
+    if 'user_id' not in session:
+        flash('Please log in to delete a user.')
+        return redirect(url_for('controllers.login'))
+    
+    if session.get('role') != 'admin':
+        abort(403)  # Unauthorized access
+
+    user = User.query.get_or_404(user_id)
+    
+    db.session.delete(user)
+    db.session.commit()
+    flash('User deleted successfully!')
+    return redirect(url_for('controllers.admin_dashboard'))
+    
 
 # Route for summary and graph
 @controllers.route('/summary')
